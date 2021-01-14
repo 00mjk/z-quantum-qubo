@@ -1,5 +1,5 @@
 from dimod import generators, BinaryQuadraticModel, ExactSolver
-from zquantum.qubo import save_qubo, load_qubo
+from zquantum.qubo import save_qubo, load_qubo, save_dimod_sample_set
 from zquantum.core.measurement import Measurements
 
 
@@ -23,3 +23,13 @@ def get_exact_qubo_solution(qubo):
     best_sample_dict = sampleset.first.sample
     solution_bitstring = tuple(best_sample_dict[i] for i in sorted(best_sample_dict))
     Measurements([solution_bitstring]).save("exact_solution.json")
+
+
+def get_exact_qubo_solution_and_energy(qubo):
+    """Solves qubo by iterating over all the possible solutions.
+    Args:
+        qubo: qubo stored as a json
+    """
+    qubo = load_qubo(qubo)
+    sampleset = ExactSolver().sample(qubo)
+    save_dimod_sample_set(sampleset, "exact_solution_and_energy.json")
