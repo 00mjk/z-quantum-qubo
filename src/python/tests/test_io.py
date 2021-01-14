@@ -1,4 +1,5 @@
 import pytest
+from dimod import generators, BinaryQuadraticModel, ExactSolver
 import dimod
 from zquantum.qubo.io import (
     bqm_to_serializable,
@@ -6,7 +7,11 @@ from zquantum.qubo.io import (
     save_qubo,
     load_qubo,
 )
+from zquantum.qubo.utils import (
+    save_dimod_sample_set,
+)
 from io import StringIO
+import os
 
 
 class TestConvertingBQMToSerializable:
@@ -142,3 +147,15 @@ def test_loading_saved_qubo_gives_the_same_qubo():
     new_qubo = load_qubo(output_file)
 
     assert qubo == new_qubo
+
+
+def test_sample_set_saving():
+
+    nbits = 4
+    qubo = generators.uniform(nbits, "BINARY", low=-1, high=1, seed=42)
+    num_sweeps = 500
+
+    sampleset = ExactSolver().sample(qubo)
+
+    save_dimod_sample_set(sampleset, "output.json")
+    os.remove("output.json")
